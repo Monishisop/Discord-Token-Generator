@@ -1,4 +1,4 @@
-# DiscordDMNuker
+# Discord-Token-Generator
 
 # What is Discord-Token-Generator?
 Discord-Token-Generator, is a discord account creator that outputs via tokens....
