@@ -27,5 +27,5 @@ Discord-Token-Generator is powered by Anarchy This means for some reason if that
 - THIS IS A HOBBY DON'T EXPECT A ETA FOR A FULL FUCTIONAL
 
 # Credits
-- https://github.com/not-ilinked/Anarchy (Anarchy Libary) (Dev Branch Used)
+- https://github.com/not-ilinked/Anarchy (Anarchy Libary) (Older Branch Used)
 - https://github.com/JReverse (Program)
