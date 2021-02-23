@@ -86,9 +86,10 @@ namespace AccountCreator
                     DiscordClient client = new DiscordClient();
                     var capclient = new CapMonsterClient("YOUR_CLIENT_KEY");
                     var email = "";
-                    using (TMailLibrary.TMail.Models.Account TMailClient = new TMailLibrary.TMail.Models.Account("https://gmail.ax/"))
+                    using (TMailLibrary.TMail.Models.Account TMailClient = new TMailLibrary.TMail.Models.Account("https://mailtemp.uk/"))
                     {
                             email = await TMailClient.GetEmailAdress();
+                            Logs.SafeAddItem(string.Format("Email: {0}", email));
                             try
                             {
                                 // Creating a NoCaptchaTaskProxyless task object
@@ -105,13 +106,13 @@ namespace AccountCreator
                                 var recaptchaResponse = solution.GRecaptchaResponse;
                                 client.RegisterAccount(new DiscordRegistration { Username = RandomString(12), Password = RandomString(12), DateOfBirth = "1994-01-01", Email = email, CaptchaKey = recaptchaResponse });
                             }
-                            catch (CapMonsterException e)
+                            catch (CapMonsterException)
                             {
                                 goto Retry;
                             }
 
                         if (VerifyEmail)
-                            await TMailVerify(TMailClient);
+                            await TMailVerify(TMailClient, client);
                     }
 
                     Logs.SafeAddItem(string.Format("Registered: {0}", client.User.Username));
@@ -130,7 +131,7 @@ namespace AccountCreator
             });
         }
 
-        private async Task TMailVerify(TMailLibrary.TMail.Models.Account TMailClient)
+        private async Task TMailVerify(TMailLibrary.TMail.Models.Account TMailClient, DiscordClient client)
         {
             int tries = 0;
             bool isverfied = false;
@@ -140,19 +141,47 @@ namespace AccountCreator
 
                 foreach (TMailLibrary.TMail.Models.Mail mail in mb)
                 {
-                    if (mail.sender_email == "UNFINISHED DONT USE YET")
+                    if (mail.sender_email == "noreply@discord.com")
                     {
-                        WriteMailDebug(mail.html);
-                        Match rgx = Regex.Match(mail.html, "UNFINISHED DONT USE YET", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+                        
+                        Match rgx = Regex.Match(mail.html, "href=\"https://click.discord.com/ls/click.....*style=\"text-decoration:none;line-", RegexOptions.IgnoreCase | RegexOptions.Compiled);
                         if (!rgx.Success)
                             throw new Exception("Failed to get Discord Confirm Email URL with Regex");
-                        string URL = rgx.Groups["value"].Value;
+                        string URL = rgx.Value;
                         using (System.Net.WebClient wc = new System.Net.WebClient())
                         {
-                            URL.Replace("\"", "");
-                            string response = await wc.DownloadStringTaskAsync(URL);
-                            if (!response.Contains("Email address successfully verified"))
-                                throw new Exception("Failed to verify Email, response at discord.com dont contain 'Email address successfully verified'");
+                            //Don't judge the fucking replace methods ong
+                            URL = URL.Replace("\" style", "");
+                            URL = URL.Replace("href=\"", "");
+                            URL = URL.Replace("text-decoration:none;line-", "");
+                            URL = URL.Replace("=\"", "");
+                            var capclient = new CapMonsterClient("YOUR_CLIENT_KEY");
+                            Retry:
+                            try
+                            {
+                                // Creating a NoCaptchaTaskProxyless task object
+                                var captchaTask = new NoCaptchaTaskProxyless
+                                {
+                                    WebsiteUrl = "https://discord.com/",
+                                    WebsiteKey = "6Lef5iQTAAAAAKeIvIY-DeexoO3gj7ryl9rLMEnn",
+                                    UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.146 Safari/537.36"
+                                };
+                                int taskId = await capclient.CreateTaskAsync(captchaTask);
+                                // Get the task result
+                                var solution = await capclient.GetTaskResultAsync<NoCaptchaTaskProxylessResult>(taskId);
+                                // Recaptcha response to be used in the form
+                                var recaptchaResponse = solution.GRecaptchaResponse;
+                                string token = Utils.GetFinalRedirect(URL).Replace("https://discord.com/verify#token=", "");
+                                WriteMailDebug(URL);
+                                WriteMailDebug(token);
+                                client.VerifyAccount(token, recaptchaResponse);
+                                if (token == null)
+                                    throw new Exception("Failed to verify Email, Token null'");
+                            }
+                            catch (CapMonsterException)
+                            {
+                                goto Retry;
+                            }
                         }
                         isverfied = true;
                         break;

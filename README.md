@@ -11,21 +11,24 @@ Discord-Token-Generator is powered by Anarchy This means for some reason if that
 - Async
 - Multi Threaded
 - Captcha Bypass
-- Latest Discord API
+- Recent Discord API
 - Creation of **UNVERIFIED ACCOUNTS**
+- Creation of **EMAIL VERIFIED ACCOUNTS**
 
 # Devolepment roadmap [❌] = In progress [✔️] = Done
 - UI [✔️]
 - Extended Logging [✔️]
 - Async [✔️]
-- Latest Discord API [✔️]
-- Email Verification [❌]
+- Recent Discord API [✔️]
+- Email Verification [✔️]
+- Phone Verification [❌]
 - PFP Changer [❌]
 - Name Setter [❌]
+- Proxy Support [❌]
 
 # FAQS
 - THIS IS A HOBBY DON'T EXPECT A ETA FOR A FULL FUCTIONAL
 
 # Credits
 - https://github.com/not-ilinked/Anarchy (Anarchy Libary) (Older Branch Used)
-- https://github.com/JReverse (Program)
+- https://github.com/JReverse (Program / Modified Anarchy)
