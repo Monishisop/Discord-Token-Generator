@@ -172,8 +172,6 @@ namespace AccountCreator
                                 // Recaptcha response to be used in the form
                                 var recaptchaResponse = solution.GRecaptchaResponse;
                                 string token = Utils.GetFinalRedirect(URL).Replace("https://discord.com/verify#token=", "");
-                                WriteMailDebug(URL);
-                                WriteMailDebug(token);
                                 client.VerifyAccount(token, recaptchaResponse);
                                 if (token == null)
                                     throw new Exception("Failed to verify Email, Token null'");
